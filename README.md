@@ -78,21 +78,6 @@ Each branch environment has:
 - Its own URL on Amplify Hosting
 - Automatic cleanup when the branch is deleted
 
-### Adding more branch patterns
-
-Edit `.github/workflows/deploy.yml` — add patterns to both the `push` and `delete` triggers:
-
-```yaml
-on:
-  push:
-    branches:
-      - main
-      - 'feature/**'
-      - 'dev'
-      - 'staging'
-      - 'your-new-pattern/**'  # add here
-```
-
 ## Local Development
 
 ```bash
