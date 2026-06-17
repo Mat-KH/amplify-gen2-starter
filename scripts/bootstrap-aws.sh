@@ -37,11 +37,11 @@ REPO_FULL="$1"
 REPO_OWNER="${REPO_FULL%%/*}"
 REPO_NAME="${REPO_FULL##*/}"
 
-# Derive app name from repo name (lowercase, hyphens only)
-APP_NAME=$(echo "$REPO_NAME" | tr '[:upper:]' '[:lower:]' | sed 's/[_.]/-/g')
+# Derive app name from owner + repo name (lowercase, hyphens only)
+APP_NAME=$(echo "${REPO_OWNER}-${REPO_NAME}" | tr '[:upper:]' '[:lower:]' | sed 's/[_.]/-/g')
 
 AWS_REGION="${AWS_REGION:-us-east-1}"
-ROLE_NAME="GitHubActions-AmplifyDeploy-${REPO_NAME}"
+ROLE_NAME="GitHubActions-AmplifyDeploy-${REPO_OWNER}-${REPO_NAME}"
 
 echo "🚀 Amplify CI/CD Bootstrap"
 echo "=========================="
