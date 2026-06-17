@@ -8,7 +8,7 @@ This template supports **two** deployment approaches. **Pick one, not both.**
 
 | | Amplify Hosting AutoBuild | GitHub Actions |
 |---|---|---|
-| **Script** | `scripts/bootstrap-amplify-hosting.sh` | `scripts/bootstrap-aws.sh` |
+| **Script** | `scripts/bootstrap-amplify-hosting.sh` | `scripts/bootstrap-github-actions.sh` |
 | **Who builds?** | AWS Amplify | GitHub Runner |
 | **Setup complexity** | Simple (no OIDC, no workflow file) | More complex (OIDC + IAM + workflow YAML) |
 | **Branch previews** | Automatic (built-in) | Manual (we built it in the workflow) |
@@ -18,7 +18,7 @@ This template supports **two** deployment approaches. **Pick one, not both.**
 
 **Recommendation:**
 - **Use Amplify Hosting** if you just want push-to-deploy with zero config → `./scripts/bootstrap-amplify-hosting.sh`
-- **Use GitHub Actions** if you need custom CI steps (tests, lint, approval gates) → `./scripts/bootstrap-aws.sh`
+- **Use GitHub Actions** if you need custom CI steps (tests, lint, approval gates) → `./scripts/bootstrap-github-actions.sh`
 
 ## Quick Start
 
@@ -47,7 +47,7 @@ export GH_TOKEN=ghp_your_token_here
 ./scripts/bootstrap-amplify-hosting.sh YOUR-ORG/your-repo
 
 # Option B: GitHub Actions (more control, custom CI steps)
-./scripts/bootstrap-aws.sh YOUR-ORG/your-repo
+./scripts/bootstrap-github-actions.sh YOUR-ORG/your-repo
 ```
 
 The bootstrap script creates all AWS resources and (for Option B) activates the GitHub Actions workflow file.
@@ -112,9 +112,9 @@ npm run dev         # Starts Vite dev server
 │   └── App.css              # Styles
 ├── scripts/
 │   ├── bootstrap-amplify-hosting.sh  # Option A: Amplify AutoBuild (simpler)
-│   └── bootstrap-aws.sh              # Option B: GitHub Actions (more control)
+│   └── bootstrap-github-actions.sh              # Option B: GitHub Actions (more control)
 ├── .github/workflow-templates/
-│   └── deploy.yml           # CI/CD pipeline (dormant until bootstrap-aws.sh activates it)
+│   └── deploy.yml           # CI/CD pipeline (dormant until bootstrap-github-actions.sh activates it)
 ├── amplify.yml              # Amplify Hosting build spec
 └── package.json
 ```

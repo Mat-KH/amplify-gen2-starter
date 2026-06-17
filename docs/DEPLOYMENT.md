@@ -2,7 +2,7 @@
 
 > **Two deployment options exist.** See the README for which to choose.
 > - Amplify Hosting AutoBuild: `scripts/bootstrap-amplify-hosting.sh`
-> - GitHub Actions: `scripts/bootstrap-aws.sh`
+> - GitHub Actions: `scripts/bootstrap-github-actions.sh`
 >
 > **Do NOT use both simultaneously** — they will conflict (double deploys).
 
@@ -13,7 +13,7 @@ For a new project:
 1. Create your repo on GitHub (clone this template or push your code)
 2. Run the bootstrap script once:
    - **Option A (Amplify AutoBuild):** `./scripts/bootstrap-amplify-hosting.sh YOUR-ORG/your-repo`
-   - **Option B (GitHub Actions):** `./scripts/bootstrap-aws.sh YOUR-ORG/your-repo`
+   - **Option B (GitHub Actions):** `./scripts/bootstrap-github-actions.sh YOUR-ORG/your-repo`
 3. Option B activates the workflow file (moves it from `.github/workflow-templates/` to `.github/workflows/`)
 4. Commit and push — deployment starts automatically ✅
 
@@ -40,7 +40,7 @@ The bootstrap script needs to set repository variables on GitHub. For this it us
 **Use the token in CloudShell:**
 ```bash
 export GH_TOKEN=ghp_your_token_here
-./scripts/bootstrap-aws.sh AWS-Community/your-repo
+./scripts/bootstrap-github-actions.sh AWS-Community/your-repo
 ```
 
 The script will:
@@ -58,17 +58,17 @@ Run from anywhere with AWS access (CloudShell recommended):
 
 ```bash
 # Download the script (or clone the repo)
-curl -O https://raw.githubusercontent.com/Mat-KH/amplify-gen2-starter/main/scripts/bootstrap-aws.sh
-chmod +x bootstrap-aws.sh
+curl -O https://raw.githubusercontent.com/Mat-KH/amplify-gen2-starter/main/scripts/bootstrap-github-actions.sh
+chmod +x bootstrap-github-actions.sh
 
 # Set your GitHub token
 export GH_TOKEN=ghp_your_token_here
 
 # Run it
-./bootstrap-aws.sh AWS-Community/your-repo
+./bootstrap-github-actions.sh AWS-Community/your-repo
 
 # Or with a custom region:
-AWS_REGION=eu-central-1 ./bootstrap-aws.sh AWS-Community/your-repo
+AWS_REGION=eu-central-1 ./bootstrap-github-actions.sh AWS-Community/your-repo
 ```
 
 This does everything in one command:
@@ -104,7 +104,7 @@ npm run dev         # Starts Vite dev server
 
 ## Important: Workflow Activation (GitHub Actions only)
 
-The workflow file lives in `.github/workflow-templates/deploy.yml` and is **dormant** by default — GitHub ignores it there. When you run `./scripts/bootstrap-aws.sh`, the script:
+The workflow file lives in `.github/workflow-templates/deploy.yml` and is **dormant** by default — GitHub ignores it there. When you run `./scripts/bootstrap-github-actions.sh`, the script:
 
 1. Creates OIDC provider + IAM role + Amplify app + sets GitHub repo variables
 2. Copies the workflow to `.github/workflows/deploy.yml` (activating it)
@@ -146,10 +146,10 @@ Each branch environment creates its own AWS resources. For DynamoDB (on-demand m
 
 | Error | Fix |
 |-------|-----|
-| **AccessDeniedException** | Run `./scripts/bootstrap-aws.sh` again — it's idempotent |
+| **AccessDeniedException** | Run `./scripts/bootstrap-github-actions.sh` again — it's idempotent |
 | **OIDC trust error** | Check the `sub` condition matches your repo and branch |
 | **Build fails on amplify_outputs.json** | `pipeline-deploy` generates this — ensure it runs before `npm run build` |
-| **Workflow fails on first push** | Ensure you ran `bootstrap-aws.sh` first — it activates the workflow and sets up credentials |
+| **Workflow fails on first push** | Ensure you ran `bootstrap-github-actions.sh` first — it activates the workflow and sets up credentials |
 | **Cannot find package 'tsx'** | Add `tsx` to devDependencies — required by `@aws-amplify/backend-cli` at runtime |
 | **BootstrapNotDetectedError** | Run `npx cdk bootstrap aws://ACCOUNT_ID/REGION` |
 | **Rollup failed to resolve @aws-amplify/data-schema-types** | Move to `dependencies` (not devDependencies) |

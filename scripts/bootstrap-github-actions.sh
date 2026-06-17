@@ -4,8 +4,8 @@ set -euo pipefail
 # ============================================================
 # Bootstrap Script: One-time AWS + GitHub setup for Amplify CI/CD
 #
-# Usage: ./scripts/bootstrap-aws.sh <owner/repo>
-# Example: ./scripts/bootstrap-aws.sh AWS-Community/kiro-project
+# Usage: ./scripts/bootstrap-github-actions.sh <owner/repo>
+# Example: ./scripts/bootstrap-github-actions.sh AWS-Community/kiro-project
 #
 # Run this in AWS CloudShell or any environment with:
 #   - AWS CLI configured (aws sts get-caller-identity works)

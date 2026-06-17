@@ -4,7 +4,7 @@ set -euo pipefail
 # ============================================================
 # Bootstrap Script: Amplify Hosting with AutoBuild
 #
-# This is the SIMPLER alternative to bootstrap-aws.sh.
+# This is the SIMPLER alternative to bootstrap-github-actions.sh.
 # Use this if you want Amplify to build/deploy automatically
 # on every push — WITHOUT needing GitHub Actions.
 #
@@ -13,7 +13,7 @@ set -euo pipefail
 #
 # ⚠️  Choose ONE:
 #   - This script (Amplify Hosting AutoBuild) — simpler, no OIDC needed
-#   - bootstrap-aws.sh (GitHub Actions) — more control, custom steps
+#   - bootstrap-github-actions.sh (GitHub Actions) — more control, custom steps
 #   DO NOT use both!
 # ============================================================
 
