@@ -2,6 +2,24 @@
 
 A battle-tested starter for React + TypeScript + Vite + AWS Amplify Gen2 apps.
 
+## ⚠️ Choose Your Deployment Method
+
+This template supports **two** deployment approaches. **Pick one, not both.**
+
+| | Amplify Hosting AutoBuild | GitHub Actions |
+|---|---|---|
+| **Script** | `scripts/bootstrap-amplify-hosting.sh` | `scripts/bootstrap-aws.sh` |
+| **Who builds?** | AWS Amplify | GitHub Runner |
+| **Setup complexity** | Simple (no OIDC, no workflow file) | More complex (OIDC + IAM + workflow YAML) |
+| **Branch previews** | Automatic (built-in) | Manual (we built it in the workflow) |
+| **Cleanup on branch delete** | Automatic (built-in) | Via workflow `delete` trigger |
+| **Custom build steps** | Limited to `amplify.yml` | Full flexibility (tests, linting, etc.) |
+| **Cost** | Amplify Build minutes (1000 free/month) | GitHub Actions minutes (2000 free/month) |
+
+**Recommendation:**
+- **Use Amplify Hosting** if you just want push-to-deploy with zero config → `./scripts/bootstrap-amplify-hosting.sh`
+- **Use GitHub Actions** if you need custom CI steps (tests, lint, approval gates) → `./scripts/bootstrap-aws.sh`
+
 ## Quick Start
 
 ### 1. Clone this template
@@ -25,11 +43,14 @@ Run in AWS CloudShell (or anywhere with AWS CLI access):
 # Set your GitHub token (create at https://github.com/settings/tokens/new with 'repo' scope)
 export GH_TOKEN=ghp_your_token_here
 
-# Run bootstrap (installs gh CLI automatically if needed)
+# Option A: Amplify Hosting AutoBuild (simpler, no GitHub Actions needed)
+./scripts/bootstrap-amplify-hosting.sh YOUR-ORG/your-repo
+
+# Option B: GitHub Actions (more control, custom CI steps)
 ./scripts/bootstrap-aws.sh YOUR-ORG/your-repo
 ```
 
-This creates all AWS resources, bootstraps CDK, and sets GitHub repo variables — all in one command.
+The bootstrap script creates all AWS resources and (for Option B) activates the GitHub Actions workflow file.
 
 ### 4. Push and deploy
 
@@ -38,7 +59,8 @@ git add . && git commit -m "feat: initial app"
 git push origin main
 ```
 
-GitHub Actions will automatically deploy backend + frontend.
+- **Option A:** Amplify builds automatically via webhook (no workflow file needed).
+- **Option B:** GitHub Actions runs the workflow and deploys.
 
 ## Branch Deployments
 
@@ -89,9 +111,10 @@ npm run dev         # Starts Vite dev server
 │   ├── App.tsx              # Your app (edit this!)
 │   └── App.css              # Styles
 ├── scripts/
-│   └── bootstrap-aws.sh     # One-time AWS/GitHub setup
-├── .github/workflows/
-│   └── deploy.yml           # CI/CD pipeline
+│   ├── bootstrap-amplify-hosting.sh  # Option A: Amplify AutoBuild (simpler)
+│   └── bootstrap-aws.sh              # Option B: GitHub Actions (more control)
+├── .github/workflow-templates/
+│   └── deploy.yml           # CI/CD pipeline (dormant until bootstrap-aws.sh activates it)
 ├── amplify.yml              # Amplify Hosting build spec
 └── package.json
 ```

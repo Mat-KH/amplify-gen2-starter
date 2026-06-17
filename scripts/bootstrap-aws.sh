@@ -249,6 +249,24 @@ gh variable set AMPLIFY_APP_ID --body "$APP_ID" --repo "${REPO_OWNER}/${REPO_NAM
 echo "   ✅ Variables set on ${REPO_OWNER}/${REPO_NAME}"
 echo ""
 
+# --- Step 6: Activate GitHub Actions workflow ---
+echo "📌 Step 6: Activating GitHub Actions workflow..."
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+if [ -f "$REPO_ROOT/.github/workflow-templates/deploy.yml" ]; then
+  mkdir -p "$REPO_ROOT/.github/workflows"
+  cp "$REPO_ROOT/.github/workflow-templates/deploy.yml" "$REPO_ROOT/.github/workflows/deploy.yml"
+  echo "   ✅ Workflow activated: .github/workflows/deploy.yml"
+  echo "   (copied from .github/workflow-templates/deploy.yml)"
+elif [ -f "$REPO_ROOT/.github/workflows/deploy.yml" ]; then
+  echo "   (workflow already active — OK)"
+else
+  echo "   ⚠️  Could not find workflow template at .github/workflow-templates/deploy.yml"
+  echo "   You'll need to manually place deploy.yml into .github/workflows/"
+fi
+echo ""
+
 # --- Done ---
 echo "=============================="
 echo "✅ Bootstrap complete!"
@@ -260,8 +278,11 @@ echo "   ROLE_ARN: ${ROLE_ARN}"
 echo "   REGION:   ${AWS_REGION}"
 echo ""
 echo "Next steps:"
-echo "  1. Push your code (including .github/workflows/deploy.yml) to main"
-echo "  2. The workflow will deploy automatically ✅"
+echo "  1. Commit the newly activated workflow file:"
+echo "     git add .github/workflows/deploy.yml"
+echo "     git commit -m 'ci: activate GitHub Actions deployment'"
+echo "     git push origin main"
+echo "  2. The workflow will deploy automatically on push ✅"
 echo ""
 echo "Branch preview URLs:"
 echo "  https://main.${APP_ID}.amplifyapp.com"

@@ -1,13 +1,21 @@
 # Deployment Guide
 
+> **Two deployment options exist.** See the README for which to choose.
+> - Amplify Hosting AutoBuild: `scripts/bootstrap-amplify-hosting.sh`
+> - GitHub Actions: `scripts/bootstrap-aws.sh`
+>
+> **Do NOT use both simultaneously** — they will conflict (double deploys).
+
 ## Quick Start (Recommended Order)
 
-For a new project, follow this order to avoid the chicken-and-egg problem:
+For a new project:
 
-1. Create your repo on GitHub (can have code, but the workflow won't succeed until bootstrap runs)
-2. Run the bootstrap script once: `./scripts/bootstrap-aws.sh AWS-Community/your-repo`
-3. Push code including `.github/workflows/deploy.yml`
-4. Every subsequent push to `main` (or any configured branch) auto-deploys ✅
+1. Create your repo on GitHub (clone this template or push your code)
+2. Run the bootstrap script once:
+   - **Option A (Amplify AutoBuild):** `./scripts/bootstrap-amplify-hosting.sh YOUR-ORG/your-repo`
+   - **Option B (GitHub Actions):** `./scripts/bootstrap-aws.sh YOUR-ORG/your-repo`
+3. Option B activates the workflow file (moves it from `.github/workflow-templates/` to `.github/workflows/`)
+4. Commit and push — deployment starts automatically ✅
 
 ## Prerequisites
 
@@ -71,8 +79,9 @@ This does everything in one command:
 5. ✅ Bootstraps CDK (if needed)
 6. ✅ Creates Amplify app + branch
 7. ✅ Sets GitHub repo variables automatically
+8. ✅ Activates the workflow file (copies to `.github/workflows/`)
 
-**After this, push your code and it deploys. No manual console clicks needed.**
+**After this, commit the activated workflow and push — deployment starts automatically.**
 
 ## What Gets Cached
 
@@ -93,13 +102,14 @@ npx ampx sandbox   # Deploys backend + generates amplify_outputs.json
 npm run dev         # Starts Vite dev server
 ```
 
-## Important: OIDC + IAM Setup Order
+## Important: Workflow Activation (GitHub Actions only)
 
-The OIDC provider and IAM role **MUST** exist before the workflow file is pushed to the repo. If you push the workflow first, the GitHub Actions run will fail because the credentials step can't assume the role.
+The workflow file lives in `.github/workflow-templates/deploy.yml` and is **dormant** by default — GitHub ignores it there. When you run `./scripts/bootstrap-aws.sh`, the script:
 
-Order of operations:
-1. Run `./scripts/bootstrap-aws.sh` (creates OIDC + role + Amplify app + repo vars)
-2. THEN push the workflow file
+1. Creates OIDC provider + IAM role + Amplify app + sets GitHub repo variables
+2. Copies the workflow to `.github/workflows/deploy.yml` (activating it)
+
+You then commit and push the newly activated file. This ensures credentials are always in place before the workflow runs.
 
 ## Multi-Branch Environments
 
@@ -139,7 +149,7 @@ Each branch environment creates its own AWS resources. For DynamoDB (on-demand m
 | **AccessDeniedException** | Run `./scripts/bootstrap-aws.sh` again — it's idempotent |
 | **OIDC trust error** | Check the `sub` condition matches your repo and branch |
 | **Build fails on amplify_outputs.json** | `pipeline-deploy` generates this — ensure it runs before `npm run build` |
-| **Workflow fails on first push** | You pushed the workflow BEFORE running bootstrap. Run bootstrap, then re-trigger |
+| **Workflow fails on first push** | Ensure you ran `bootstrap-aws.sh` first — it activates the workflow and sets up credentials |
 | **Cannot find package 'tsx'** | Add `tsx` to devDependencies — required by `@aws-amplify/backend-cli` at runtime |
 | **BootstrapNotDetectedError** | Run `npx cdk bootstrap aws://ACCOUNT_ID/REGION` |
 | **Rollup failed to resolve @aws-amplify/data-schema-types** | Move to `dependencies` (not devDependencies) |
