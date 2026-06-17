@@ -102,19 +102,21 @@ if ! gh auth status &>/dev/null; then
     echo "$GH_TOKEN" | gh auth login --with-token
   else
     echo ""
-    echo "   ⚠️  GitHub CLI is not authenticated."
+    echo "   GitHub CLI is not authenticated."
+    echo "   You need a Personal Access Token with 'repo' scope."
+    echo "   (Create one at: https://github.com/settings/tokens/new)"
     echo ""
-    echo "   Option 1: Set a Personal Access Token (recommended for CloudShell):"
-    echo "     export GH_TOKEN=ghp_your_token_here"
-    echo "     Then re-run this script."
+    read -rsp "   Paste your GitHub token here (input is hidden): " GH_TOKEN_INPUT
     echo ""
-    echo "   Option 2: Interactive login (if browser available):"
-    echo "     gh auth login"
-    echo ""
-    echo "   To create a token: https://github.com/settings/tokens/new"
-    echo "   Required scopes: repo (+ admin:org for organization repos)"
-    echo ""
-    exit 1
+    if [ -z "$GH_TOKEN_INPUT" ]; then
+      echo "   ❌ No token provided. Exiting."
+      exit 1
+    fi
+    echo "$GH_TOKEN_INPUT" | gh auth login --with-token
+    if ! gh auth status &>/dev/null; then
+      echo "   ❌ Authentication failed. Check your token and try again."
+      exit 1
+    fi
   fi
 fi
 echo "   ✅ Authenticated as: $(gh api user --jq '.login')"
