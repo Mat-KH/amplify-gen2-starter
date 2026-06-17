@@ -13,7 +13,7 @@ set -euo pipefail
 #
 # Prerequisites:
 #   - You must have a GitHub Personal Access Token (classic) with
-#     scopes: repo, admin:org (for org repos) or just repo (for personal repos)
+#     scopes: repo (full control of private repositories)
 #   - Set it as: export GH_TOKEN="ghp_your_token_here"
 #     OR the script will prompt you to authenticate interactively.
 # ============================================================
@@ -96,13 +96,12 @@ echo ""
 
 # --- Verify GitHub auth ---
 echo "📌 Step 0c: Verifying GitHub authentication..."
-if ! gh auth status &>/dev/null; then
-  if [ -n "${GH_TOKEN:-}" ]; then
-    echo "   Using GH_TOKEN environment variable..."
-    echo "$GH_TOKEN" | gh auth login --with-token
+if [ -z "${GH_TOKEN:-}" ]; then
+  if gh auth status &>/dev/null; then
+    echo "   ✅ Already authenticated via gh CLI"
   else
     echo ""
-    echo "   GitHub CLI is not authenticated."
+    echo "   GitHub authentication required."
     echo "   You need a Personal Access Token with 'repo' scope."
     echo "   (Create one at: https://github.com/settings/tokens/new)"
     echo ""
@@ -112,14 +111,16 @@ if ! gh auth status &>/dev/null; then
       echo "   ❌ No token provided. Exiting."
       exit 1
     fi
-    echo "$GH_TOKEN_INPUT" | gh auth login --with-token
-    if ! gh auth status &>/dev/null; then
-      echo "   ❌ Authentication failed. Check your token and try again."
-      exit 1
-    fi
+    export GH_TOKEN="$GH_TOKEN_INPUT"
   fi
 fi
-echo "   ✅ Authenticated as: $(gh api user --jq '.login')"
+
+# Verify the token works (simple API call)
+GH_USER=$(GH_TOKEN="${GH_TOKEN:-}" gh api user --jq '.login' 2>/dev/null) || {
+  echo "   ❌ GitHub authentication failed. Check your token has 'repo' scope."
+  exit 1
+}
+echo "   ✅ Authenticated as: $GH_USER"
 echo ""
 
 # --- Step 1: OIDC Provider ---
