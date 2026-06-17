@@ -157,31 +157,6 @@ aws iam attach-role-policy \
   --policy-arn arn:aws:iam::aws:policy/service-role/AmplifyBackendDeployFullAccess \
   2>/dev/null || true
 
-aws iam put-role-policy \
-  --role-name "$ROLE_NAME" \
-  --policy-name "AmplifyHostingAccess" \
-  --policy-document '{
-    "Version": "2012-10-17",
-    "Statement": [{
-      "Effect": "Allow",
-      "Action": [
-        "amplify:StartDeployment",
-        "amplify:GetApp",
-        "amplify:GetBranch",
-        "amplify:ListApps",
-        "amplify:ListBranches",
-        "amplify:CreateBranch",
-        "amplify:DeleteBranch",
-        "amplify:CreateDeployment",
-        "amplify:StartJob",
-        "amplify:StopJob",
-        "amplify:GetJob",
-        "amplify:ListJobs"
-      ],
-      "Resource": "*"
-    }]
-  }'
-
 ROLE_ARN="arn:aws:iam::${ACCOUNT_ID}:role/${ROLE_NAME}"
 echo "   ✅ Role ARN: $ROLE_ARN"
 echo ""
@@ -210,6 +185,57 @@ aws amplify create-branch \
   --region "$AWS_REGION" 2>/dev/null || echo "   (branch already exists — OK)"
 
 echo "   ✅ App ID: $APP_ID"
+echo ""
+
+# --- Step 4b: Region-scoped inline policies ---
+echo "📌 Step 4b: Applying region-scoped IAM policies..."
+aws iam put-role-policy \
+  --role-name "$ROLE_NAME" \
+  --policy-name "AmplifyHostingAccess" \
+  --policy-document "{
+    \"Version\": \"2012-10-17\",
+    \"Statement\": [{
+      \"Effect\": \"Allow\",
+      \"Action\": [
+        \"amplify:StartDeployment\",
+        \"amplify:GetApp\",
+        \"amplify:GetBranch\",
+        \"amplify:ListApps\",
+        \"amplify:ListBranches\",
+        \"amplify:CreateBranch\",
+        \"amplify:DeleteBranch\",
+        \"amplify:CreateDeployment\",
+        \"amplify:StartJob\",
+        \"amplify:StopJob\",
+        \"amplify:GetJob\",
+        \"amplify:ListJobs\"
+      ],
+      \"Resource\": \"arn:aws:amplify:${AWS_REGION}:${ACCOUNT_ID}:apps/${APP_ID}/*\"
+    }]
+  }"
+
+aws iam put-role-policy \
+  --role-name "$ROLE_NAME" \
+  --policy-name "DenyOtherRegions" \
+  --policy-document "{
+    \"Version\": \"2012-10-17\",
+    \"Statement\": [{
+      \"Effect\": \"Deny\",
+      \"Action\": [
+        \"amplify:*\",
+        \"appsync:*\",
+        \"dynamodb:*\"
+      ],
+      \"Resource\": \"*\",
+      \"Condition\": {
+        \"StringNotEquals\": {
+          \"aws:RequestedRegion\": \"${AWS_REGION}\"
+        }
+      }
+    }]
+  }"
+
+echo "   ✅ Policies scoped to region: $AWS_REGION"
 echo ""
 
 # --- Step 5: Set GitHub Repo Variables ---

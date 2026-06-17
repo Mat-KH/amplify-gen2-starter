@@ -145,3 +145,4 @@ Each branch environment creates its own AWS resources. For DynamoDB (on-demand m
 | **Rollup failed to resolve @aws-amplify/data-schema-types** | Move to `dependencies` (not devDependencies) |
 | **TS2688: Cannot find type definition file** | Add explicit `"types": ["react", "react-dom"]` to tsconfig.json |
 | **Node.js runner deprecated** | Use `NODE_VERSION: 24` in deploy.yml (GitHub deprecated Node 20 runners) |
+| **Operations denied in other regions** | The IAM role is scoped to the region configured during bootstrap. If you need to change regions, re-run the bootstrap script with the new `AWS_REGION`. |
