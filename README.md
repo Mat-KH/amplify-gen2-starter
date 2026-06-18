@@ -6,15 +6,26 @@ A battle-tested starter for React + TypeScript + Vite + AWS Amplify Gen2 apps.
 
 This template supports **two** deployment approaches. **Pick one, not both.**
 
-| | Amplify Hosting AutoBuild | GitHub Actions |
+| | Amplify Hosting AutoBuild (Pull) | GitHub Actions (Push) |
 |---|---|---|
 | **Script** | `scripts/bootstrap-amplify-hosting.sh` | `scripts/bootstrap-github-actions.sh` |
-| **Who builds?** | AWS Amplify | GitHub Runner |
-| **Setup complexity** | Simple (no OIDC, no workflow file) | More complex (OIDC + IAM + workflow YAML) |
-| **Branch previews** | Automatic (built-in) | Manual (we built it in the workflow) |
+| **Principle** | AWS pulls code from GitHub on change | GitHub pushes build artifacts to AWS |
+| **Who builds & deploys?** | AWS Amplify (automatic via webhook) | GitHub Actions Runner (active push) |
+| **Auth mechanism** | GitHub Token (webhook) | OIDC Federation (no long-lived secrets) |
+| **Setup complexity** | Simple (no OIDC, no workflow file) | More involved (OIDC + IAM + workflow YAML) |
+| **Flexibility** | Limited (`amplify.yml` build spec) | Full (arbitrary workflow steps) |
+
+<details>
+<summary><strong>Additional comparison details</strong></summary>
+
+| | Amplify Hosting AutoBuild | GitHub Actions |
+|---|---|---|
+| **Branch previews** | Automatic (built-in) | Manual (built into the workflow) |
 | **Cleanup on branch delete** | Automatic (built-in) | Via workflow `delete` trigger |
-| **Custom build steps** | Limited to `amplify.yml` | Full flexibility (tests, linting, etc.) |
+| **Custom build steps** | Limited to `amplify.yml` | Full flexibility (tests, linting, approval gates, etc.) |
 | **Cost** | Amplify Build minutes (1000 free/month) | GitHub Actions minutes (2000 free/month) |
+
+</details>
 
 **Recommendation:**
 - **Use Amplify Hosting** if you just want push-to-deploy with zero config → `./scripts/bootstrap-amplify-hosting.sh`
